@@ -15,7 +15,7 @@ const Nav = styled(motion.div)`
   position: fixed;
   width: 100%;
   top: 0;
-  font-size: 20px;
+  font-size: 16px;
   padding: 20px 60px;
   color: white;
 `;
