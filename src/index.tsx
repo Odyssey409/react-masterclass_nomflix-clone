@@ -39,7 +39,11 @@ footer, header, hgroup, main, menu, nav, section {
     display: none;
 }
 body {
-  line-height: 1;
+  line-height: 1.2;
+  font-weight: 300;
+  font-family: 'Source Sans Pro', sans-serif;
+  color: ${(props) => props.theme.white.darker};
+  background-color:black;
 }
 menu, ol, ul {
   list-style: none;
