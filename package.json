@@ -50,5 +50,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://Odyssey409.github.io/react-masterclass_nomflix-clone"
+  "homepage": "https://Odyssey409.github.io/react-masterclass_nomflix-clone",
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3"
+  }
 }
