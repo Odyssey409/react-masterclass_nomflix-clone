@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { makeImagePath } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { hover } from "@testing-library/user-event/dist/hover";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -58,6 +59,12 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-position: center center;
   height: 200px;
   color: red;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
 
 const rowVariants = {
@@ -69,6 +76,15 @@ const rowVariants = {
   },
   exit: {
     x: -window.outerWidth + 10,
+  },
+};
+
+const boxVariants = {
+  normal: { scale: 1 },
+  hover: {
+    scale: 1.3,
+    transition: { delay: 0.3, type: "tween", duration: 0.2 },
+    y: -50,
   },
 };
 
@@ -121,6 +137,10 @@ function Home() {
                   .map((movie) => (
                     <Box
                       key={movie.id}
+                      whileHover="hover"
+                      initial="normal"
+                      variants={boxVariants}
+                      transition={{ type: "tween" }}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                     ></Box>
                   ))}
