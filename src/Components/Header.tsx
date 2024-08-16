@@ -132,6 +132,7 @@ function Header() {
   useMotionValueEvent(scrollY, "change", () => {
     if (scrollY.get() > 80) {
       navAnimation.start("scroll");
+      console.log(scrollY);
     } else {
       navAnimation.start("top");
     }
