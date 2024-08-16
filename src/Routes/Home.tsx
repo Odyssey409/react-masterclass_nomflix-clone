@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { makeImagePath } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { hover } from "@testing-library/user-event/dist/hover";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -59,6 +59,7 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-position: center center;
   height: 200px;
   color: red;
+  cursor: pointer;
 
   &:first-child {
     transform-origin: center left;
@@ -113,6 +114,8 @@ const InfoVariants = {
 const offset = 6;
 
 function Home() {
+  const history = useHistory();
+  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
@@ -129,6 +132,9 @@ function Home() {
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
+  const onBoxClick = (movieId: number) => {
+    history.push(`/movies/${movieId}`);
+  };
 
   return (
     <Wrapper>
@@ -158,9 +164,11 @@ function Home() {
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
+                      layoutId={movie.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
                       key={movie.id}
                       whileHover="hover"
                       initial="normal"
+                      onClick={() => onBoxClick(movie.id)}
                       variants={boxVariants}
                       transition={{ type: "tween" }}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -173,6 +181,23 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {bigMovieMatch ? (
+              <motion.div
+                layoutId={bigMovieMatch.params.movieId}
+                style={{
+                  position: "absolute",
+                  width: "40vw",
+                  height: "40vh",
+                  backgroundColor: "red",
+                  top: 50,
+                  left: 0,
+                  right: 0,
+                  margin: "0 auto",
+                }}
+              ></motion.div>
+            ) : null}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>
