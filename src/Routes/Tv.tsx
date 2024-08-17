@@ -313,7 +313,7 @@ function Tv() {
 
           <SliderWrapper>
             <SliderAiringTodayTV>
-              <SliderTitle>Now Playing</SliderTitle>
+              <SliderTitle>Now Airing Today</SliderTitle>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                 <Row
                   variants={rowVariants}
@@ -349,7 +349,7 @@ function Tv() {
               </AnimatePresence>
             </SliderAiringTodayTV>
             <SliderOnTheAirTV>
-              <SliderTitle>Top Rated</SliderTitle>
+              <SliderTitle>On The Air</SliderTitle>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                 <Row
                   variants={rowVariants}
@@ -384,7 +384,7 @@ function Tv() {
             </SliderOnTheAirTV>
 
             <SliderPopularTV>
-              <SliderTitle>Up Coming</SliderTitle>
+              <SliderTitle>Popular</SliderTitle>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                 <Row
                   variants={rowVariants}
@@ -419,7 +419,7 @@ function Tv() {
             </SliderPopularTV>
 
             <SliderTopRatedTV>
-              <SliderTitle>Popular</SliderTitle>
+              <SliderTitle>Top Rated</SliderTitle>
               <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                 <Row
                   variants={rowVariants}

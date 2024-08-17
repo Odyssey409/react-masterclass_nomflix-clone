@@ -30,6 +30,38 @@ export interface IGetTvResult {
   total_results: number;
 }
 
+interface IMovieSearch {
+  id: number;
+  backdrop_path: string;
+  poster_path: string;
+  title: string;
+  name: string;
+  overview: string;
+}
+
+export interface IGetMovieSearchResult {
+  page: number;
+  results: IMovieSearch[];
+  total_pages: number;
+  total_results: number;
+}
+
+interface ITvSearch {
+  id: number;
+  backdrop_path: string;
+  poster_path: string;
+  name: string;
+  title: string;
+  overview: string;
+}
+
+export interface IGetTvSearchResult {
+  page: number;
+  results: ITvSearch[];
+  total_pages: number;
+  total_results: number;
+}
+
 export function getNowPlayingMovies() {
   return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
     (response) => response.json()
@@ -76,4 +108,20 @@ export function getTopRatedTV() {
   return fetch(`${BASE_PATH}/tv/top_rated?api_key=${API_KEY}`).then(
     (response) => response.json()
   );
+}
+
+export function getMovieSearch(
+  keyword: string | null
+): Promise<IGetMovieSearchResult> {
+  return fetch(
+    `${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
+}
+
+export function getTvSearch(
+  keyword: string | null
+): Promise<IGetTvSearchResult> {
+  return fetch(
+    `${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
 }
