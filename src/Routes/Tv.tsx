@@ -1,10 +1,12 @@
 import { useQuery } from "react-query";
 import {
   IGetTvResult,
+  ITvDetail,
   getAiringTodayTV,
   getOnTheAirTV,
   getPopularTV,
   getTopRatedTV,
+  getTvById,
 } from "../api";
 import styled from "styled-components";
 import { makeImagePath } from "../utils";
@@ -103,6 +105,7 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   &:last-child {
     transform-origin: center right;
   }
+  border-radius: 10px;
 `;
 
 const Info = styled(motion.div)`
@@ -163,6 +166,52 @@ const BigOverview = styled.p`
   top: -80px;
 `;
 
+const BigPoster = styled.div`
+  width: 250px;
+  background-size: cover;
+  background-position: center center;
+  height: 300px;
+  position: absolute;
+  left: 20px;
+  bottom: 150px;
+`;
+
+const BigType = styled.div`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 130px;
+  height: 50px;
+  left: 800px;
+  top: -35px;
+  font-size: 20px;
+  border: 1px solid white;
+  border-radius: 5px;
+  font-weight: 600;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
+const BigVoteAvg = styled.div`
+  color: yellow;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  left: 240px;
+  top: -135px;
+  font-size: 20px;
+  border: 1px solid #b43f3f;
+  border-radius: 50%;
+  font-weight: 600;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
 const NextButton = styled.button`
   position: absolute;
   border-radius: 50%;
@@ -212,6 +261,8 @@ const offset = 6;
 function Tv() {
   const history = useHistory();
   const bigTvMatch = useRouteMatch<{ seriesId: string }>("/tv/:seriesId");
+  const [whichSliderClicked, setWhichSliderClicked] = useState<string>("");
+  const [seriesID, setSeriesID] = useState<number>(0);
 
   const useMultipleQuery = () => {
     const NowAiringTodayTv = useQuery<IGetTvResult>(
@@ -282,19 +333,25 @@ function Tv() {
 
   const toggleLeaving = () => setLeaving((prev) => !prev);
 
-  const onBoxClick = (seriesId: number) => {
+  const onBoxClick = (seriesId: number, whichSlider: string) => {
     history.push(`/tv/${seriesId}`);
+    setWhichSliderClicked(whichSlider);
+    setSeriesID(seriesId);
   };
+
+  const { data, isLoading } = useQuery<ITvDetail>(["tv", seriesID], () =>
+    getTvById(seriesID)
+  );
 
   const onOverlayClick = () => {
     history.push("/");
   };
 
-  const clickedTv =
-    bigTvMatch?.params.seriesId &&
-    dataNowAiringToday?.results.find(
-      (tv) => tv.id === +bigTvMatch.params.seriesId
-    ); // +는 string을 number로 변환
+  const clickedTv = bigTvMatch?.params.seriesId
+    ? data?.id === Number(bigTvMatch.params.seriesId)
+      ? data
+      : undefined
+    : undefined;
 
   return (
     <Wrapper>
@@ -328,11 +385,11 @@ function Tv() {
                     .slice(offset * index, offset * index + offset)
                     .map((tv) => (
                       <Box
-                        layoutId={tv.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={tv.id + "NowAiringToday"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={tv.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(tv.id)}
+                        onClick={() => onBoxClick(tv.id, "NowAiringToday")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
@@ -364,11 +421,11 @@ function Tv() {
                     .slice(offset * index, offset * index + offset)
                     .map((tv) => (
                       <Box
-                        layoutId={tv.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={tv.id + "OnTheAir"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={tv.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(tv.id)}
+                        onClick={() => onBoxClick(tv.id, "OnTheAir")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
@@ -399,11 +456,11 @@ function Tv() {
                     .slice(offset * index, offset * index + offset)
                     .map((tv) => (
                       <Box
-                        layoutId={tv.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={tv.id + "Popular"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={tv.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(tv.id)}
+                        onClick={() => onBoxClick(tv.id, "Popular")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
@@ -434,11 +491,11 @@ function Tv() {
                     .slice(offset * index, offset * index + offset)
                     .map((tv) => (
                       <Box
-                        layoutId={tv.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={tv.id + "TopRated"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={tv.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(tv.id)}
+                        onClick={() => onBoxClick(tv.id, "TopRated")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
@@ -461,7 +518,9 @@ function Tv() {
                   exit={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 ></Overlay>
-                <BigTv layoutId={bigTvMatch.params.seriesId}>
+                <BigTv
+                  layoutId={bigTvMatch.params.seriesId + whichSliderClicked}
+                >
                   {clickedTv && (
                     <>
                       <BigCover
@@ -472,6 +531,18 @@ function Tv() {
                           )})`,
                         }}
                       />
+                      <BigPoster
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black,transparent), url(${makeImagePath(
+                            clickedTv.poster_path,
+                            "w500"
+                          )})`,
+                        }}
+                      ></BigPoster>
+                      <BigType>{clickedTv.type}</BigType>
+                      <BigVoteAvg>
+                        {clickedTv.vote_average.toFixed(2)}
+                      </BigVoteAvg>
                       <BigTitle>{clickedTv.name}</BigTitle>
                       <BigOverview>{clickedTv.overview}</BigOverview>
                     </>

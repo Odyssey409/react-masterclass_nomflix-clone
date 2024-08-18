@@ -91,6 +91,7 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   &:last-child {
     transform-origin: center right;
   }
+  border-radius: 10px;
 `;
 
 const Info = styled(motion.div)`
@@ -313,7 +314,7 @@ function Search() {
                   key={index}
                 >
                   {dataMovieSearched?.results
-                    .slice(1)
+
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
@@ -349,7 +350,7 @@ function Search() {
                   key={index}
                 >
                   {dataTvSearched?.results
-                    .slice(1)
+
                     .slice(offset * index, offset * index + offset)
                     .map((tv) => (
                       <Box

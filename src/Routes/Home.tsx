@@ -5,12 +5,15 @@ import {
   getTopRatedMovies,
   IGetMoviesResult,
   getUpComingMovies,
+  IMovieDetail,
+  getMovieById,
 } from "../api";
 import styled from "styled-components";
 import { makeImagePath } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import { set } from "react-hook-form";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -103,6 +106,8 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   &:last-child {
     transform-origin: center right;
   }
+
+  border-radius: 10px;
 `;
 
 const Info = styled(motion.div)`
@@ -151,16 +156,63 @@ const BigCover = styled.div`
 const BigTitle = styled.h2`
   color: ${(props) => props.theme.white.lighter};
   padding: 20px;
-  font-size: 28px;
+  font-size: 48px;
   position: relative;
-  top: -60px;
+  top: -160px;
+  font-weight: 600;
 `;
 
 const BigOverview = styled.p`
   color: ${(props) => props.theme.white.lighter};
   padding: 20px;
   position: relative;
-  top: -80px;
+  top: -180px;
+`;
+
+const BigPoster = styled.div`
+  width: 250px;
+  background-size: cover;
+  background-position: center center;
+  height: 300px;
+  position: absolute;
+  left: 20px;
+  bottom: 150px;
+`;
+
+const BigRunTime = styled.div`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 130px;
+  height: 50px;
+  left: 800px;
+  top: -35px;
+  font-size: 20px;
+  border: 1px solid white;
+  border-radius: 5px;
+  font-weight: 600;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
+const BigVoteAvg = styled.div`
+  color: yellow;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  left: 240px;
+  top: -135px;
+  font-size: 20px;
+  border: 1px solid #b43f3f;
+  border-radius: 50%;
+  font-weight: 600;
+  background-color: ${(props) => props.theme.black.lighter};
 `;
 
 const NextButton = styled.button`
@@ -212,6 +264,8 @@ const offset = 6;
 function Home() {
   const history = useHistory();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
+  const [whichSliderClicked, setWhichSliderClicked] = useState<string>("");
+  const [movieIdClicked, setMovieIdClicked] = useState<number>(0);
 
   const useMultipleQuery = () => {
     const nowPlayingMovies = useQuery<IGetMoviesResult>(
@@ -285,19 +339,26 @@ function Home() {
 
   const toggleLeaving = () => setLeaving((prev) => !prev);
 
-  const onBoxClick = (movieId: number) => {
+  const onBoxClick = (movieId: number, whichSlider: string) => {
     history.push(`/movies/${movieId}`);
+    setWhichSliderClicked(whichSlider);
+    setMovieIdClicked(movieId);
   };
+
+  const { data, isLoading } = useQuery<IMovieDetail>(
+    ["movies", movieIdClicked],
+    () => getMovieById(movieIdClicked)
+  );
 
   const onOverlayClick = () => {
     history.push("/");
   };
 
-  const clickedMovie =
-    bigMovieMatch?.params.movieId &&
-    dataNowPlaying?.results.find(
-      (movie) => movie.id === +bigMovieMatch.params.movieId
-    ); // +는 string을 number로 변환
+  const clickedMovie = bigMovieMatch?.params.movieId
+    ? data?.id === Number(bigMovieMatch.params.movieId)
+      ? data
+      : undefined
+    : undefined;
 
   return (
     <Wrapper>
@@ -331,11 +392,11 @@ function Home() {
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
-                        layoutId={movie.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={movie.id + "nowPlaying"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={movie.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(movie.id)}
+                        onClick={() => onBoxClick(movie.id, "nowPlaying")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -365,11 +426,11 @@ function Home() {
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
-                        layoutId={movie.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={movie.id + "topRated"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={movie.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(movie.id)}
+                        onClick={() => onBoxClick(movie.id, "topRated")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -400,11 +461,11 @@ function Home() {
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
-                        layoutId={movie.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={movie.id + "upComing"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={movie.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(movie.id)}
+                        onClick={() => onBoxClick(movie.id, "upComing")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -435,11 +496,11 @@ function Home() {
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
-                        layoutId={movie.id + ""} // layoutId must be a string이여서 movie.id를 string으로 변환
+                        layoutId={movie.id + "popular"} // layoutId must be a string이여서 movie.id를 string으로 변환
                         key={movie.id}
                         whileHover="hover"
                         initial="normal"
-                        onClick={() => onBoxClick(movie.id)}
+                        onClick={() => onBoxClick(movie.id, "popular")}
                         variants={boxVariants}
                         transition={{ type: "tween" }}
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
@@ -462,7 +523,9 @@ function Home() {
                   exit={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 ></Overlay>
-                <BigMovie layoutId={bigMovieMatch.params.movieId}>
+                <BigMovie
+                  layoutId={bigMovieMatch.params.movieId + whichSliderClicked}
+                >
                   {clickedMovie && (
                     <>
                       <BigCover
@@ -473,6 +536,18 @@ function Home() {
                           )})`,
                         }}
                       />
+                      <BigPoster
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black,transparent), url(${makeImagePath(
+                            clickedMovie.poster_path,
+                            "w500"
+                          )})`,
+                        }}
+                      ></BigPoster>
+                      <BigRunTime>{clickedMovie.runtime} Mins</BigRunTime>
+                      <BigVoteAvg>
+                        {clickedMovie.vote_average.toFixed(2)}
+                      </BigVoteAvg>
                       <BigTitle>{clickedMovie.title}</BigTitle>
                       <BigOverview>{clickedMovie.overview}</BigOverview>
                     </>

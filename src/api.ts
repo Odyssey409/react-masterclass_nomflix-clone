@@ -8,6 +8,26 @@ interface IMovie {
   title: string;
   overview: string;
 }
+
+export interface IMovieDetail {
+  id: number;
+  backdrop_path: string;
+  poster_path: string;
+  title: string;
+  overview: string;
+  vote_average: number;
+  runtime: number;
+}
+
+export interface ITvDetail {
+  id: number;
+  backdrop_path: string;
+  poster_path: string;
+  name: string;
+  overview: string;
+  vote_average: number;
+  type: string;
+}
 export interface IGetMoviesResult {
   dates: { minimum: string; maximum: string };
   page: number;
@@ -124,4 +144,16 @@ export function getTvSearch(
   return fetch(
     `${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`
   ).then((response) => response.json());
+}
+
+export function getMovieById(movieID: number | null): Promise<IMovieDetail> {
+  return fetch(`${BASE_PATH}/movie/${movieID}?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
+
+export function getTvById(seriesID: number | null): Promise<ITvDetail> {
+  return fetch(`${BASE_PATH}/movie/${seriesID}?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
 }
